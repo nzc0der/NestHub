@@ -108,6 +108,11 @@ def _ensure_initialized() -> None:
 def create_app() -> Flask:
     cfg = settings.load_config()
     app = Flask(__name__, template_folder=os.path.join(PROJECT_ROOT, "templates"))
+    
+    # Enable CORS for decoupled frontend deployments (e.g. Netlify)
+    from flask_cors import CORS
+    CORS(app, supports_credentials=True)
+
     app.secret_key = cfg.get("secret_key", os.urandom(32).hex())
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
