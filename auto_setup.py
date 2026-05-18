@@ -121,5 +121,30 @@ def main():
     print(f"  Initial Password: None (Users will be prompted to set a password on first login!)")
     print("=" * 60)
 
+    # --- Start background update thread and run Flask server ---
+    import threading
+    import server
+
+    # Start background update thread
+    update_thread = threading.Thread(
+        target=server._background_update_loop,
+        name="AutoUpdateThread",
+        daemon=True,
+    )
+    update_thread.start()
+    server.logger.info("Auto-update thread started (interval: %ds).", server._UPDATE_INTERVAL_SECONDS)
+
+    # Create and run Flask application
+    app = server.create_app()
+    port = 8000
+    server.logger.info("Starting Family Dashboard server on 0.0.0.0:%d via auto_setup.py", port)
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        threaded=True,
+        use_reloader=False,
+    )
+
 if __name__ == "__main__":
     main()
