@@ -80,10 +80,11 @@
     {% if messages %}
     <div class="flash-list" style="margin-bottom: 2rem;">
       {% for category, message in messages %}
-      <div class="flash flash-{{ category }} glass-panel" style="padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 0.75rem; border-left: 4px solid var(--{{ category if category != 'danger' else 'danger' }});">
+      <div class="flash-message flash-{{ category if category != 'danger' else 'danger' }}">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" style="color: var(--{{ category }});"></i>
-          <span style="font-weight: 600;">{{ message }}</span>
+          <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} 
+             text-{{ 'danger' if category == 'danger' else category }}"></i>
+          <span style="font-weight: 700; font-size: 1rem;">{{ message }}</span>
         </div>
       </div>
       {% endfor %}
@@ -96,7 +97,7 @@
 
   <!-- Password Modal -->
   <div id="password-modal" class="base-modal-overlay hidden">
-    <div class="glass-panel" style="width: 90%; max-width: 400px; padding: 2.5rem;">
+    <div class="glass-panel modal-content" style="width: 90%; max-width: 440px; padding: 3rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h2 style="font-size: 1.5rem;">Change Password</h2>
         <button class="btn btn-ghost" onclick="UI.hideModal('password-modal')" style="width: 36px; height: 36px; padding: 0; border-radius: 50%;"><i class="fas fa-times"></i></button>
@@ -115,10 +116,36 @@
     </div>
   </div>
 
+  <!-- Forced Password Setup Modal -->
+  {% if session.must_set_password %}
+  <div class="base-modal-overlay" style="z-index: 9999;">
+    <div class="glass-panel modal-content" style="width: 90%; max-width: 440px; padding: 3rem; text-align: center;">
+      <div style="margin-bottom: 2rem;">
+        <div class="brand-icon" style="width: 54px; height: 54px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+          <i class="fas fa-key" style="color: white; font-size: 1.4rem;"></i>
+        </div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Create a Password</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Your account does not have a password. Please create a password to secure your profile before continuing.</p>
+      </div>
+      <form method="POST" action="{{ url_for('change_password') }}">
+        <div style="margin-bottom: 1.5rem; text-align: left;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase;">New Password</label>
+          <input type="password" name="new_password" required placeholder="••••••••" style="width: 100%; height: 48px; padding: 0 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: hsla(0,0%,100%,0.02); color: white;">
+        </div>
+        <div style="margin-bottom: 2rem; text-align: left;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase;">Confirm Password</label>
+          <input type="password" name="confirm_password" required placeholder="••••••••" style="width: 100%; height: 48px; padding: 0 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: hsla(0,0%,100%,0.02); color: white;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; border-radius: 8px;">Set Password & Continue</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Mode Selector Modal -->
   {% if not session.ui_mode_selected %}
   <div class="base-modal-overlay">
-    <div class="glass-panel" style="width: 90%; max-width: 500px; padding: 3rem; text-align: center;">
+    <div class="glass-panel modal-content" style="width: 90%; max-width: 540px; padding: 4rem 3rem; text-align: center;">
       <h2 style="font-size: 2rem; margin-bottom: 1rem;">Welcome Home</h2>
       <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Choose your preferred experience for this session.</p>
       

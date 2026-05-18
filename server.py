@@ -71,15 +71,24 @@ logger = logging.getLogger(__name__)
 
 def _ensure_initialized() -> None:
     """
-    If the system has not been set up yet, launch setup.py interactively and
-    then exit so that systemd restarts the service from a clean state.
+    If the system has not been set up yet, launch setup.py interactively or
+    auto_setup.py non-interactively, and then exit so that systemd restarts
+    the service from a clean state.
     """
     if not settings.is_initialized():
-        logger.info("System not initialized. Launching setup wizard.")
-        result = subprocess.run(
-            [sys.executable, os.path.join(PROJECT_ROOT, "setup.py")],
-            check=False,
-        )
+        auto_setup_path = os.path.join(PROJECT_ROOT, "auto_setup.py")
+        if os.path.exists(auto_setup_path):
+            logger.info("System not initialized. Launching non-interactive auto-setup wizard.")
+            result = subprocess.run(
+                [sys.executable, auto_setup_path],
+                check=False,
+            )
+        else:
+            logger.info("System not initialized. Launching interactive setup wizard.")
+            result = subprocess.run(
+                [sys.executable, os.path.join(PROJECT_ROOT, "setup.py")],
+                check=False,
+            )
         if result.returncode != 0:
             logger.error(
                 "Setup wizard exited with code %d. Refusing to start server.",
@@ -197,6 +206,18 @@ def _register_routes(app: Flask) -> None:
                     return redirect(url_for("dashboard"))
                 flash("Guest account is not configured.", "danger")
                 return render_template("login.html")
+
+            # Check if the user has no password configured yet
+            user = settings.get_user_by_username(username)
+            if user and user["role"] != "guest" and (user.get("password_hash") is None or user.get("password_hash") == ""):
+                session.permanent = True
+                session["user_id"] = user["id"]
+                session["username"] = user["username"]
+                session["role"] = user["role"]
+                session["shopping_permission"] = user.get("shopping_permission", "full")
+                session["must_set_password"] = True
+                logger.info("User '%s' logged in with NO PASSWORD. Prompting for setup.", username)
+                return redirect(url_for("dashboard"))
 
             user = settings.verify_user(username, password)
             if user:

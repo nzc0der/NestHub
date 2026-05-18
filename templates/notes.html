@@ -6,52 +6,58 @@
 <style>
   .notes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
   }
   .note-card {
-    height: 320px;
-    padding: 1.5rem;
+    height: 340px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    background: hsla(0, 0%, 100%, 0.02);
+    border: 1px solid var(--border-color);
   }
   .note-card h3 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    margin-bottom: 1.25rem;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    color: var(--primary);
   }
   .note-body {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 1rem;
     display: -webkit-box;
-    -webkit-line-clamp: 6;
+    line-clamp: 5;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;
-    line-height: 1.6;
+    line-height: 1.7;
   }
   .note-footer {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-dim);
+    font-weight: 700;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem;">
   <div>
-    <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Family Notes</h1>
-    <p style="color: var(--text-muted); font-weight: 600;">Shared wisdom and quick reminders</p>
+    <h1 class="text-gradient" style="font-size: 4rem; margin-bottom: 0.75rem;">Family Notes</h1>
+    <p style="color: var(--text-muted); font-weight: 700; font-size: 1.2rem;">Shared wisdom and quick reminders</p>
   </div>
   {% if session.role != 'guest' %}
   <button class="btn btn-primary" onclick="openNoteEditor()">
@@ -63,11 +69,15 @@
 
 <div class="notes-grid">
   {% for note in notes %}
-  <div class="glass-panel note-card" onclick="openNoteEditor({{ note.id }}, {{ note.title|tojson|safe }}, {{ note.content|tojson|safe }})">
+  <div class="glass-panel note-card" 
+       data-note-id="{{ note.id }}" 
+       data-note-title="{{ note.title|tojson|safe|forceescape }}" 
+       data-note-content="{{ note.content|tojson|safe|forceescape }}"
+       onclick="handleNoteClick(this)">
     <h3>{{ note.title or "Untitled Note" }}</h3>
     <div class="note-body">{{ note.content }}</div>
     <div class="note-footer">
-      <span><i class="fas fa-user-edit"></i> {{ note.author|capitalize }}</span>
+      <span><i class="fas fa-user-edit" style="margin-right: 6px;"></i> {{ note.author|capitalize }}</span>
       <span>{{ note.updated_at[:10] }}</span>
     </div>
   </div>
@@ -83,28 +93,28 @@
 {% endif %}
 
 <!-- Note Editor Modal -->
-<div id="note-editor-modal" class="base-modal-overlay hidden" style="z-index: 3000; background: hsla(240, 10%, 4%, 0.98);">
-  <div style="width: 100%; max-width: 800px; height: 90vh; padding: 2rem; display: flex; flex-direction: column;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-      <h2 id="editor-title-display">New Note</h2>
+<div id="note-editor-modal" class="base-modal-overlay hidden">
+  <div class="glass-panel modal-content" style="width: 100%; max-width: 900px; height: 90vh; padding: 4rem; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+      <h2 id="editor-title-display" style="font-size: 2.2rem;">New Note</h2>
       <div style="display: flex; gap: 1rem;">
         <form id="delete-note-form" method="POST" action="" style="display: none;">
-          <button type="submit" class="btn btn-ghost" style="color: var(--danger);"><i class="fas fa-trash-can"></i></button>
+          <button type="submit" class="btn btn-ghost" style="color: var(--danger); width: 50px; height: 50px; padding: 0;"><i class="fas fa-trash-can"></i></button>
         </form>
-        <button class="btn btn-ghost" onclick="UI.hideModal('note-editor-modal')"><i class="fas fa-times"></i></button>
+        <button class="btn btn-ghost" onclick="UI.hideModal('note-editor-modal')" style="width: 50px; height: 50px; padding: 0;"><i class="fas fa-times"></i></button>
       </div>
     </div>
-    <form method="POST" action="{{ url_for('note_save') }}" style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
+    <form method="POST" action="{{ url_for('note_save') }}" style="flex: 1; display: flex; flex-direction: column; gap: 2rem;">
       <input type="hidden" name="note_id" id="editor-note-id">
       <div>
-        <label style="display: block; font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 0.6rem; text-transform: uppercase;">Title</label>
-        <input type="text" name="title" id="editor-title" required placeholder="Note Title" style="font-size: 1.5rem; font-weight: 800; padding: 1rem 1.5rem;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Title</label>
+        <input type="text" name="title" id="editor-title" required placeholder="Note Title" style="font-size: 1.8rem; font-weight: 800; padding: 1.25rem 1.75rem;">
       </div>
       <div style="flex: 1; display: flex; flex-direction: column;">
-        <label style="display: block; font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 0.6rem; text-transform: uppercase;">Content</label>
-        <textarea name="content" id="editor-content" required placeholder="Write your thoughts..." style="flex: 1; resize: none; padding: 1.5rem; font-size: 1.1rem; line-height: 1.6;"></textarea>
+        <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Content</label>
+        <textarea name="content" id="editor-content" required placeholder="Write your thoughts..." style="flex: 1; resize: none; padding: 2rem; font-size: 1.2rem; line-height: 1.8;"></textarea>
       </div>
-      <button type="submit" class="btn btn-primary" style="height: 60px; font-size: 1.1rem;">Save Note</button>
+      <button type="submit" class="btn btn-primary" style="height: 70px; font-size: 1.2rem;">Save Note</button>
     </form>
   </div>
 </div>
@@ -113,6 +123,13 @@
 
 {% block extra_scripts %}
 <script>
+  function handleNoteClick(el) {
+    const id = el.getAttribute('data-note-id');
+    const title = JSON.parse(el.getAttribute('data-note-title'));
+    const content = JSON.parse(el.getAttribute('data-note-content'));
+    openNoteEditor(id, title, content);
+  }
+
   function openNoteEditor(id = null, title = '', content = '') {
     const modal = document.getElementById('note-editor-modal');
     const titleDisp = document.getElementById('editor-title-display');
@@ -136,10 +153,5 @@
     modal.classList.remove('hidden');
     titleInput.focus();
   }
-
-  // Handle JS escaping in template
-  {% if notes %}
-  // Filter for escapejs or similar if needed, but here we'll just use manual trigger.
-  {% endif %}
 </script>
 {% endblock %}

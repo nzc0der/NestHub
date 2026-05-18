@@ -75,6 +75,7 @@
     line-height: 0.8;
     letter-spacing: -0.05em;
     background: linear-gradient(135deg, #fff, hsla(0, 0%, 100%, 0.4));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -118,8 +119,8 @@
 {% block content %}
 <div class="dashboard-header">
   <div>
-    <h1 style="font-size: 4rem; margin-bottom: 0.5rem;" id="greeting-text">Overview</h1>
-    <p id="date-display" style="color: var(--text-muted); font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;"></p>
+    <h1 class="text-gradient" style="font-size: 5rem; margin-bottom: 0.5rem;" id="greeting-text">Overview</h1>
+    <p id="date-display" style="color: var(--text-muted); font-weight: 700; font-size: 1.4rem; letter-spacing: 0.05em;"></p>
   </div>
   {% if session.role != 'guest' %}
   <button class="btn btn-primary" onclick="UI.showModal('new-task-modal')">
@@ -161,12 +162,12 @@
     <span class="section-label"><i class="fas fa-list-check"></i> Active Tasks</span>
     <div class="list-stack">
       {% for todo in todos[:5] %}
-      <div class="task-item" onclick="document.getElementById('toggle-todo-{{ todo.id }}').submit();">
-        <div style="display: flex; gap: 1rem; align-items: center;">
-          <div style="width: 22px; height: 22px; border: 2px solid {% if todo.done %}var(--primary){% else %}var(--border-color){% endif %}; background: {% if todo.done %}var(--primary){% else %}transparent{% endif %}; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
-            {% if todo.done %}<i class="fas fa-check" style="color: white; font-size: 0.7rem;"></i>{% endif %}
+      <div class="task-item-modern {% if todo.done %}task-done{% endif %}" onclick="document.getElementById('toggle-todo-{{ todo.id }}').submit();">
+        <div style="display: flex; gap: 1.25rem; align-items: center;">
+          <div class="checkbox-custom">
+            {% if todo.done %}<i class="fas fa-check" style="color: white; font-size: 0.8rem;"></i>{% endif %}
           </div>
-          <div style="{% if todo.done %}text-decoration: line-through; color: var(--text-dim);{% endif %} font-weight: 700;">{{ todo.content }}</div>
+          <div class="task-text" style="font-weight: 700; font-size: 1.05rem;">{{ todo.content }}</div>
         </div>
         <form id="toggle-todo-{{ todo.id }}" method="POST" action="{{ url_for('todo_toggle', todo_id=todo.id) }}" style="display: none;"></form>
       </div>
@@ -185,12 +186,12 @@
     <span class="section-label"><i class="fas fa-calendar-star"></i> Upcoming</span>
     <div class="list-stack">
       {% for ev in events[:3] %}
-      <div style="display: flex; gap: 1rem; align-items: center; padding: 0.75rem; background: hsla(0,0%,100%,0.02); border-radius: 12px; cursor: pointer;" onclick="window.location.href='{{ url_for('calendar') }}';">
+      <div class="task-item-modern" style="gap: 1.25rem;" data-url="{{ url_for('calendar') }}" onclick="window.location.href=this.dataset.url">
         <div class="upcoming-date">
           <span style="font-size: 0.6rem; text-transform: uppercase;">{{ ev.event_date[5:7] }}</span>
           <span style="font-size: 1.1rem;">{{ ev.event_date[8:10] }}</span>
         </div>
-        <div style="font-weight: 800; font-size: 1rem;">{{ ev.title }}</div>
+        <div style="font-weight: 800; font-size: 1.1rem;">{{ ev.title }}</div>
       </div>
       {% endfor %}
       {% if not events %}
@@ -200,7 +201,7 @@
   </div>
 
   <!-- Announcements -->
-  <div class="bento-item glass-panel bento-announcements" onclick="window.location.href='{{ url_for('board') }}';" style="cursor: pointer;">
+  <div class="bento-item glass-panel bento-announcements" data-url="{{ url_for('board') }}" onclick="window.location.href=this.dataset.url" style="cursor: pointer;">
     <span class="section-label"><i class="fas fa-bullhorn"></i> Family Board</span>
     <div class="list-stack">
       {% for ann in announcements[:2] %}
@@ -249,16 +250,16 @@
 
 <!-- Modals -->
 <div id="new-task-modal" class="base-modal-overlay hidden">
-  <div class="glass-panel" style="width: 90%; max-width: 440px; padding: 2.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-      <h2 style="font-size: 1.5rem;">New Task</h2>
-      <button class="btn btn-ghost" onclick="UI.hideModal('new-task-modal')" style="width: 36px; height: 36px; padding: 0; border-radius: 50%;"><i class="fas fa-times"></i></button>
+  <div class="glass-panel modal-content" style="width: 90%; max-width: 500px; padding: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.8rem;">New Task</h2>
+      <button class="btn btn-ghost" onclick="UI.hideModal('new-task-modal')" style="width: 44px; height: 44px; padding: 0; border-radius: 50%;"><i class="fas fa-times"></i></button>
     </div>
     <form method="POST" action="{{ url_for('todo_add') }}">
-      <div style="margin-bottom: 2rem;">
-        <input type="text" name="content" required placeholder="What needs to be done?" autofocus>
+      <div style="margin-bottom: 2.5rem;">
+        <input type="text" name="content" required placeholder="What needs to be done?" autofocus style="font-size: 1.2rem; padding: 1.25rem 1.5rem;">
       </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%;">Create Task</button>
+      <button type="submit" class="btn btn-primary" style="width: 100%; height: 60px; font-size: 1.1rem;">Create Task</button>
     </form>
   </div>
 </div>

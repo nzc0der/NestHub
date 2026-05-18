@@ -91,7 +91,7 @@
       
       <div class="user-select-grid">
         {% for user in users %}
-        <div class="user-option" onclick="selectUser('{{ user.username }}', this)">
+        <div class="user-option" onclick="selectUser('{{ user.username }}', this, {{ 'false' if user.password_hash is none else 'true' }})">
           <div class="user-avatar">{{ user.username[0]|upper }}</div>
           <span class="user-name">{{ user.username }}</span>
         </div>
@@ -117,7 +117,7 @@
   </div>
 
   <script>
-    function selectUser(username, el) {
+    function selectUser(username, el, hasPassword = true) {
       document.getElementById('selected-username').value = username;
       
       // Toggle UI
@@ -128,7 +128,7 @@
       const passInput = document.getElementById('password-input');
       const btn = document.getElementById('login-button');
       
-      if (username === 'guest') {
+      if (username === 'guest' || !hasPassword) {
         passField.style.display = 'none';
         passInput.required = false;
         btn.style.opacity = '1';
