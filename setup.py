@@ -103,27 +103,33 @@ def _prompt_int(prompt_text: str, minimum: int = 1, maximum: int = 20) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _resolve_paths() -> tuple[str, str]:
+def _resolve_config() -> dict:
     """
-    Ask the operator where to store the database and backups.
+    Ask the operator for system configuration.
 
-    Returns (db_path, backup_dir).  Both are absolute paths.
+    Returns a dictionary of configuration values.
     """
     data_dir_default = os.path.join(PROJECT_ROOT, "data")
     backup_dir_default = os.path.join(PROJECT_ROOT, "backups")
+    port_default = 5000
+    lat_default = -37.9034
+    lon_default = 145.0416
+    city_default = "Ormond"
 
     print(SEPARATOR)
-    print("Storage Paths")
+    print("System Configuration")
     print(SEPARATOR)
-    print(f"Default database directory : {data_dir_default}")
-    print(f"Default backup directory   : {backup_dir_default}")
-    print()
 
-    use_defaults = _prompt("Use default paths? [Y/n]: ").lower()
+    use_defaults = _prompt("Use default configuration? [Y/n]: ").lower()
     if use_defaults in ("", "y", "yes"):
         db_path = os.path.join(data_dir_default, "family.db")
         backup_dir = backup_dir_default
+        port = port_default
+        lat = lat_default
+        lon = lon_default
+        city = city_default
     else:
+        # Paths
         db_dir_raw = _prompt(
             f"Absolute path for the database DIRECTORY [{data_dir_default}]: ",
             allow_empty=True,
@@ -137,11 +143,29 @@ def _resolve_paths() -> tuple[str, str]:
         )
         backup_dir = os.path.abspath(backup_raw or backup_dir_default)
 
+        # Server Port
+        port = _prompt_int(f"Server Port [{port_default}]: ", 1, 65535) or port_default
+
+        # Weather
+        print("\nWeather Location:")
+        city = _prompt(f"  City Name [{city_default}]: ", allow_empty=True) or city_default
+        lat_raw = _prompt(f"  Latitude [{lat_default}]: ", allow_empty=True)
+        lat = float(lat_raw) if lat_raw else lat_default
+        lon_raw = _prompt(f"  Longitude [{lon_default}]: ", allow_empty=True)
+        lon = float(lon_raw) if lon_raw else lon_default
+
     # Ensure directories exist.
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     os.makedirs(backup_dir, exist_ok=True)
 
-    return db_path, backup_dir
+    return {
+        "db_path": db_path,
+        "backup_dir": backup_dir,
+        "port": port,
+        "latitude": lat,
+        "longitude": lon,
+        "city": city
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -177,18 +201,11 @@ def run_setup() -> None:
         )
         return
 
-    # --- Storage paths ---
-    db_path, backup_dir = _resolve_paths()
+    # --- Configuration ---
+    config_data = _resolve_config()
+    config_data["secret_key"] = _generate_secret_key()
+    config_data["project_root"] = PROJECT_ROOT
 
-    # Build and save config first so that settings._db_path() resolves
-    # correctly when we call init_schema() and add_user() below.
-    secret_key = _generate_secret_key()
-    config_data = {
-        "db_path": db_path,
-        "backup_dir": backup_dir,
-        "secret_key": secret_key,
-        "project_root": PROJECT_ROOT,
-    }
     settings.save_config(config_data)
     logger.info("config.json written.")
 
@@ -274,8 +291,10 @@ def run_setup() -> None:
     print("=" * 60)
     print("  Setup Complete!")
     print("=" * 60)
-    print(f"\n  Database : {db_path}")
-    print(f"  Backups  : {backup_dir}")
+    print(f"\n  Database : {config_data['db_path']}")
+    print(f"  Backups  : {config_data['backup_dir']}")
+    print(f"  Port     : {config_data['port']}")
+    print(f"  City     : {config_data['city']}")
     print(f"  Users    : {', '.join(created_users + ['guest'])}")
     print(
         "\n  The first user listed is the admin.\n"

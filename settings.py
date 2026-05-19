@@ -37,6 +37,10 @@ CONFIG_PATH: str = os.path.join(PROJECT_ROOT, "config.json")
 # Default paths written by setup.py; settings.py can override via config.
 _DEFAULT_DB_PATH: str = os.path.join(PROJECT_ROOT, "data", "family.db")
 _DEFAULT_BACKUP_DIR: str = os.path.join(PROJECT_ROOT, "backups")
+_DEFAULT_PORT: int = 5000
+_DEFAULT_LATITUDE: float = -37.9034
+_DEFAULT_LONGITUDE: float = 145.0416
+_DEFAULT_CITY: str = "Ormond"
 
 # ---------------------------------------------------------------------------
 # Config helpers
@@ -122,6 +126,22 @@ def _backup_dir() -> str:
     """Return the absolute path to the backups directory from config or default."""
     cfg = load_config()
     return cfg.get("backup_dir", _DEFAULT_BACKUP_DIR)
+
+
+def get_server_port() -> int:
+    """Return the server port from config or default."""
+    cfg = load_config()
+    return cfg.get("port", _DEFAULT_PORT)
+
+
+def get_weather_config() -> dict:
+    """Return weather configuration (lat, lon, city) from config or default."""
+    cfg = load_config()
+    return {
+        "lat": cfg.get("latitude", _DEFAULT_LATITUDE),
+        "lon": cfg.get("longitude", _DEFAULT_LONGITUDE),
+        "city": cfg.get("city", _DEFAULT_CITY)
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -277,7 +297,7 @@ def get_user_by_username(username: str) -> Optional[dict]:
     """Return a single user dict or None if not found."""
     with _get_db() as conn:
         row = conn.execute(
-            "SELECT id, username, password_hash, role, created_at, shopping_permission FROM users WHERE username = ?",
+            "SELECT id, username, password_hash, role, created_at, shopping_permission, status FROM users WHERE username = ?",
             (username,),
         ).fetchone()
     return dict(row) if row else None
@@ -287,7 +307,7 @@ def get_user_by_id(user_id: int) -> Optional[dict]:
     """Return a single user dict by primary key, or None."""
     with _get_db() as conn:
         row = conn.execute(
-            "SELECT id, username, password_hash, role, created_at, shopping_permission FROM users WHERE id = ?",
+            "SELECT id, username, password_hash, role, created_at, shopping_permission, status FROM users WHERE id = ?",
             (user_id,),
         ).fetchone()
     return dict(row) if row else None

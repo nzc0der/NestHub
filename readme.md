@@ -1,53 +1,38 @@
-#  Family Dashboard
+# Family Dashboard
 
-![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi-pink)
-![Python](https://img.shields.io/badge/python-3.11+-blue)
-[![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/nzc0der/FamilySystem/blob/main/LICENSE)
-![Status](https://img.shields.io/badge/status-active-success)
-![Maintenance](https://img.shields.io/badge/maintained-yes-brightgreen)
-[![HTML5](https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://python.org)
-
-A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organise your family life with task management, shopping lists, shared calendars, and more—all in one beautiful, private interface.
-
----
+A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organize your family life with task management, shopping lists, shared calendars, and shared notes, all within a private, secure interface.
 
 ## Table of Contents
 
-1. [ Features](#features)
-2. [ System Requirements](#system-requirements)
-3. [ Installation](#installation)
-4. [ First-Run Setup](#first-run-setup)
-5. [ Configuring the systemd Service](#configuring-the-systemd-service)
-6. [ Accessing the Dashboard](#accessing-the-dashboard)
-7. [ Backup & Recovery](#backup--recovery)
-8. [ Safe Manual Reset](#safe-manual-reset)
-9. [ Troubleshooting](#troubleshooting)
+1. [Features](#features)
+2. [System Requirements](#system-requirements)
+3. [Installation](#installation)
+4. [First-Run Setup](#first-run-setup)
+5. [Configuring the systemd Service](#configuring-the-systemd-service)
+6. [Accessing the Dashboard](#accessing-the-dashboard)
+7. [Backup and Recovery](#backup-and-recovery)
+8. [Safe Manual Reset](#safe-manual-reset)
+9. [Troubleshooting](#troubleshooting)
+10. [License](#license)
 
----
+## Features
 
-##  Features
+- **Bento-style User Interface**: A modern, responsive dashboard layout optimized for both desktop and mobile devices.
+- **Shared Calendar**: Coordinate family events and appointments with a centralized calendar system.
+- **Shopping List**: Collaborative management for household essentials and groceries.
+- **Notes System**: Secure, shared notes with full Markdown support for structured information.
+- **Family Status Board**: Monitor the availability and status of family members in real-time.
+- **Self-Hosted Privacy**: All data is stored locally on your Raspberry Pi, ensuring complete privacy and control.
 
-- **Bento-style UI**: A modern, responsive dashboard layout.
-- **Shared Calendar**: Keep track of family events and appointments.
-- **Shopping List**: Collaborative list for groceries and essentials.
-- **Notes System**: Secure, shared notes with Markdown support.
-- **Family Status Board**: Track member availability at a glance.
-- **Self-Hosted**: Your data stays in your home on your Raspberry Pi.
+## System Requirements
 
----
-
-##  System Requirements
-
-| Requirement         | Version / Notes                               |
-|---------------------|-----------------------------------------------|
-| **Hardware**        | Raspberry Pi 4, 400, or 5 (recommended)       |
-| **Operating System**| Raspberry Pi OS (64-bit recommended)          |
-| **Python**          | 3.11 or later                                 |
-| **Git**             | For updates and version control               |
-| **Network**         | Local Wi-Fi or Ethernet                       |
-
----
+| Requirement | Version / Notes |
+|-------------|-----------------|
+| **Hardware** | Raspberry Pi 4, 400, or 5 recommended |
+| **Operating System** | Raspberry Pi OS (64-bit recommended) |
+| **Python** | 3.11 or later |
+| **Git** | Required for updates and version control |
+| **Network** | Local Wi-Fi or Ethernet connection |
 
 ## Installation
 
@@ -58,25 +43,21 @@ A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organ
    ```
 
 2. **Run the setup script**:
-   The setup script will create a virtual environment, install dependencies, and prepare the configuration.
+   The setup script creates a virtual environment, installs necessary dependencies, and initializes the configuration.
    ```bash
    python3 setup.py
    ```
 
----
+## First-Run Setup
 
-##  First-Run Setup
+Following the initial setup, configure the administrative user and system parameters.
+1. Start the server: `python3 server.py`
+2. Navigate to the address displayed in the terminal via a web browser.
+3. Complete the on-screen wizard to establish the primary family account.
 
-After running the setup script, you will need to configure your admin user and basic settings.
-1. Run the server: `python3 server.py`
-2. Open your browser and navigate to the address shown in the terminal.
-3. Follow the on-screen wizard to create your primary family account.
+## Configuring the systemd Service
 
----
-
-##  Configuring the systemd Service
-
-To ensure the dashboard starts automatically when your Pi boots:
+To ensure the dashboard initiates automatically upon system boot:
 
 1. Copy the service file:
    ```bash
@@ -89,43 +70,33 @@ To ensure the dashboard starts automatically when your Pi boots:
    sudo systemctl start family_dashboard.service
    ```
 
----
+## Accessing the Dashboard
 
-##  Accessing the Dashboard
-
-Once running, access the dashboard from any device on your local network:
+Access the dashboard from any device on the local network:
 - **URL**: `http://<your-pi-ip>:5000`
-- **Default Port**: 5000 (configurable in `config.json`)
+- **Default Port**: 5000 (configurable during setup)
 
----
+## Backup and Recovery
 
-##  Backup & Recovery
+The system includes an automated backup mechanism. Backups are preserved in the `backups/` directory.
 
-The dashboard includes an automated backup system. Backups are stored in the `backups/` directory.
+- **Manual Backup**: Execute `python3 server.py --backup`
+- **Restore**: Utilize the `reset_system.py` tool to restore the database from a specific snapshot.
 
-- **Manual Backup**: Run `python3 server.py --backup`
-- **Restore**: Use the `reset_system.py` tool to restore from a specific snapshot.
+## Safe Manual Reset
 
----
-
-##  Safe Manual Reset
-
-If you need to wipe the system and start fresh:
+To reinitialize the system and clear all existing data:
 ```bash
 python3 reset_system.py
 ```
-*Warning: This will delete all user data and settings.*
+*Note: This action will permanently delete all user data and configurations.*
 
----
+## Troubleshooting
 
-##  Troubleshooting
+- **Port Conflict**: Verify if another instance is running or modify the port in the configuration.
+- **Permission Issues**: Ensure the user has appropriate read/write permissions for the project directory.
+- **Missing Dependencies**: Re-execute `pip install -r requirements.txt` within the virtual environment.
 
-- **Port already in use**: Check if another instance is running or change the port in `config.json`.
-- **Permission Denied**: Ensure you have read/write permissions in the project folder.
-- **Missing Dependencies**: Re-run `pip install -r requirements.txt` within your virtual environment.
+## License
 
----
-
-##  License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. Refer to the `LICENSE` file for further details.

@@ -44,6 +44,7 @@
         </div>
         <div class="dropdown-content glass-panel" id="user-dropdown-content" style="display: none; position: absolute; right: 0; top: 110%; width: 220px; padding: 0.5rem; z-index: 1001;">
           {% if session.role != 'guest' %}
+          <a href="#" onclick="UI.showModal('status-modal')" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-main); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-circle-user" style="margin-right: 8px; width: 16px;"></i> Update Status</a>
           <a href="#" onclick="UI.showModal('password-modal')" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-main); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-key" style="margin-right: 8px; width: 16px;"></i> Change Password</a>
           {% endif %}
           {% if session.role == 'admin' %}
@@ -92,6 +93,29 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+  </div>
+
+  <!-- Status Modal -->
+  <div id="status-modal" class="base-modal-overlay hidden">
+    <div class="glass-panel" style="width: 90%; max-width: 400px; padding: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.5rem;">Update Status</h2>
+        <button class="btn btn-ghost" onclick="UI.hideModal('status-modal')" style="width: 36px; height: 36px; padding: 0; border-radius: 50%;"><i class="fas fa-times"></i></button>
+      </div>
+      <form method="POST" action="{{ url_for('update_status') }}">
+        <div style="margin-bottom: 2rem;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase;">Current Status</label>
+          <select name="status" required>
+            <option value="Available">Available</option>
+            <option value="Busy">Busy</option>
+            <option value="Away">Away</option>
+            <option value="At Work">At Work</option>
+            <option value="Sleeping">Sleeping</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Status</button>
+      </form>
+    </div>
   </div>
 
   <!-- Password Modal -->

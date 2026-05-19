@@ -20,6 +20,7 @@ import subprocess
 import sys
 import threading
 import time
+import markdown
 from datetime import datetime
 from functools import wraps
 
@@ -104,6 +105,13 @@ def create_app() -> Flask:
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     # Keep sessions alive for up to 8 hours of inactivity.
     app.config["PERMANENT_SESSION_LIFETIME"] = 8 * 3600
+
+    # Register Jinja Filters
+    @app.template_filter('markdown')
+    def render_markdown(text):
+        if not text:
+            return ""
+        return markdown.markdown(text, extensions=['extra', 'nl2br'])
 
     _register_routes(app)
     return app
@@ -242,6 +250,7 @@ def _register_routes(app: Flask) -> None:
         events = settings.get_events()
         all_users = settings.get_users()
         meal_plan = settings.get_meal_plan()
+        weather_cfg = settings.get_weather_config()
         return render_template(
             "dashboard.html",
             todos=todos,
@@ -251,6 +260,7 @@ def _register_routes(app: Flask) -> None:
             events=events,
             all_users=all_users,
             meal_plan=meal_plan,
+            weather_cfg=weather_cfg,
             now=datetime.now()
         )
 
@@ -487,6 +497,15 @@ def _register_routes(app: Flask) -> None:
     # ------------------------------------------------------------------
     # Profile
     # ------------------------------------------------------------------
+
+    @app.route("/profile/status", methods=["POST"])
+    @login_required
+    def update_status():
+        status = request.form.get("status", "Available").strip()
+        if status:
+            settings.update_user_status(session["user_id"], status)
+            flash(f"Status updated to {status}.", "success")
+        return redirect(request.referrer or url_for("dashboard"))
 
     @app.route("/profile/password", methods=["POST"])
     @login_required
@@ -916,7 +935,7 @@ if __name__ == "__main__":
 
     # --- Create and run Flask application ---
     app = create_app()
-    port = 8000
+    port = settings.get_server_port()
     logger.info("Starting Family Dashboard server on 0.0.0.0:%d", port)
     app.run(
         host="0.0.0.0",
