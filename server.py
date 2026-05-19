@@ -935,7 +935,7 @@ if __name__ == "__main__":
 
     # --- Create and run Flask application ---
     app = create_app()
-    port = settings.get_server_port()
+    port = 8000
     logger.info("Starting Family Dashboard server on 0.0.0.0:%d", port)
     app.run(
         host="0.0.0.0",

@@ -65,7 +65,7 @@
   {% for note in notes %}
   <div class="glass-panel note-card" onclick="openNoteEditor({{ note.id }}, {{ note.title|tojson|safe }}, {{ note.content|tojson|safe }})">
     <h3>{{ note.title or "Untitled Note" }}</h3>
-    <div class="note-body">{{ note.content|markdown|striptags }}</div>
+    <div class="note-body">{{ note.content|markdown|safe }}</div>
     <div class="note-footer">
       <span><i class="fas fa-user-edit"></i> {{ note.author|capitalize }}</span>
       <span>{{ note.updated_at[:10] }}</span>

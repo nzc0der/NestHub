@@ -1,21 +1,33 @@
-# Family Dashboard
+#  Family Dashboard
+
+![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi-pink)
+![Python](https://img.shields.io/badge/python-3.11+-blue)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/nzc0der/FamilySystem/blob/main/LICENSE)
+![Status](https://img.shields.io/badge/status-active-success)
+![Maintenance](https://img.shields.io/badge/maintained-yes-brightgreen)
+[![HTML5](https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://python.org)
 
 A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organize your family life with task management, shopping lists, shared calendars, and shared notes, all within a private, secure interface.
 
+---
+
 ## Table of Contents
 
-1. [Features](#features)
-2. [System Requirements](#system-requirements)
-3. [Installation](#installation)
-4. [First-Run Setup](#first-run-setup)
-5. [Configuring the systemd Service](#configuring-the-systemd-service)
-6. [Accessing the Dashboard](#accessing-the-dashboard)
-7. [Backup and Recovery](#backup-and-recovery)
-8. [Safe Manual Reset](#safe-manual-reset)
-9. [Troubleshooting](#troubleshooting)
-10. [License](#license)
+1. [ Features](#features)
+2. [ System Requirements](#system-requirements)
+3. [ Installation](#installation)
+4. [ First-Run Setup](#first-run-setup)
+5. [ Configuring the systemd Service](#configuring-the-systemd-service)
+6. [ Accessing the Dashboard](#accessing-the-dashboard)
+7. [ Backup & Recovery](#backup--recovery)
+8. [ Safe Manual Reset](#safe-manual-reset)
+9. [ Troubleshooting](#troubleshooting)
+10. [ License](#license)
 
-## Features
+---
+
+##  Features
 
 - **Bento-style User Interface**: A modern, responsive dashboard layout optimized for both desktop and mobile devices.
 - **Shared Calendar**: Coordinate family events and appointments with a centralized calendar system.
@@ -24,7 +36,9 @@ A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organ
 - **Family Status Board**: Monitor the availability and status of family members in real-time.
 - **Self-Hosted Privacy**: All data is stored locally on your Raspberry Pi, ensuring complete privacy and control.
 
-## System Requirements
+---
+
+##  System Requirements
 
 | Requirement | Version / Notes |
 |-------------|-----------------|
@@ -33,6 +47,8 @@ A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organ
 | **Python** | 3.11 or later |
 | **Git** | Required for updates and version control |
 | **Network** | Local Wi-Fi or Ethernet connection |
+
+---
 
 ## Installation
 
@@ -48,14 +64,18 @@ A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organ
    python3 setup.py
    ```
 
-## First-Run Setup
+---
+
+##  First-Run Setup
 
 Following the initial setup, configure the administrative user and system parameters.
 1. Start the server: `python3 server.py`
 2. Navigate to the address displayed in the terminal via a web browser.
 3. Complete the on-screen wizard to establish the primary family account.
 
-## Configuring the systemd Service
+---
+
+##  Configuring the systemd Service
 
 To ensure the dashboard initiates automatically upon system boot:
 
@@ -70,20 +90,26 @@ To ensure the dashboard initiates automatically upon system boot:
    sudo systemctl start family_dashboard.service
    ```
 
-## Accessing the Dashboard
+---
+
+##  Accessing the Dashboard
 
 Access the dashboard from any device on the local network:
-- **URL**: `http://<your-pi-ip>:5000`
-- **Default Port**: 5000 (configurable during setup)
+- **URL**: `http://<your-pi-ip>:8000`
+- **Default Port**: 8000 (configurable in `config.json`)
 
-## Backup and Recovery
+---
+
+##  Backup & Recovery
 
 The system includes an automated backup mechanism. Backups are preserved in the `backups/` directory.
 
 - **Manual Backup**: Execute `python3 server.py --backup`
 - **Restore**: Utilize the `reset_system.py` tool to restore the database from a specific snapshot.
 
-## Safe Manual Reset
+---
+
+##  Safe Manual Reset
 
 To reinitialize the system and clear all existing data:
 ```bash
@@ -91,12 +117,16 @@ python3 reset_system.py
 ```
 *Note: This action will permanently delete all user data and configurations.*
 
-## Troubleshooting
+---
+
+##  Troubleshooting
 
 - **Port Conflict**: Verify if another instance is running or modify the port in the configuration.
 - **Permission Issues**: Ensure the user has appropriate read/write permissions for the project directory.
 - **Missing Dependencies**: Re-execute `pip install -r requirements.txt` within the virtual environment.
 
-## License
+---
+
+##  License
 
 Distributed under the MIT License. Refer to the `LICENSE` file for further details.

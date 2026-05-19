@@ -111,7 +111,7 @@ def _resolve_config() -> dict:
     """
     data_dir_default = os.path.join(PROJECT_ROOT, "data")
     backup_dir_default = os.path.join(PROJECT_ROOT, "backups")
-    port_default = 5000
+    port_default = 8000
     lat_default = -37.9034
     lon_default = 145.0416
     city_default = "Ormond"
