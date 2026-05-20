@@ -204,7 +204,6 @@ def init_schema() -> None:
             );
             """
         )
-        # Migration for existing databases
         try:
             conn.execute("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'Available';")
         except sqlite3.OperationalError:
@@ -301,7 +300,7 @@ def delete_user(user_id: int) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Feature helpers (todos, notes, announcements, etc.)
+# Feature helpers
 # ---------------------------------------------------------------------------
 
 def get_todos(user_id: int) -> list[dict]:

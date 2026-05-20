@@ -4,7 +4,7 @@ server.py - Main Flask application entry point.
 Responsibilities:
   1. On startup: check initialization state.  If setup has not been run,
      invoke setup.py interactively and exit so systemd can restart.
-  2. Start the Flask server on 0.0.0.0:5000.
+  2. Start the Flask server on 0.0.0.0:8000.
   3. Register routes for: login/logout, dashboard (to-dos + notes),
      family announcement board, and the admin/update panel.
   4. Run the GitHub auto-update and backup system on a background thread
@@ -98,6 +98,10 @@ def _ensure_initialized() -> None:
 
 
 def create_app() -> Flask:
+    # Ensure schema is up to date (idempotent)
+    # Moving this here ensures initialization even when imported.
+    settings.init_schema()
+
     cfg = settings.load_config()
     app = Flask(__name__, template_folder=os.path.join(PROJECT_ROOT, "templates"))
     app.secret_key = cfg.get("secret_key", os.urandom(32).hex())
@@ -921,9 +925,6 @@ if __name__ == "__main__":
     # --- Initialization guard ---
     _ensure_initialized()
 
-    # --- Ensure schema is up to date (idempotent) ---
-    settings.init_schema()
-
     # --- Start background update thread ---
     update_thread = threading.Thread(
         target=_background_update_loop,
@@ -939,7 +940,7 @@ if __name__ == "__main__":
     logger.info("Starting Family Dashboard server on 0.0.0.0:%d", port)
     app.run(
         host="0.0.0.0",
-        port=port,
+        port=8000,
         debug=False,
         threaded=True,
         use_reloader=False,  # We handle restarts via systemd, not Flask's reloader.

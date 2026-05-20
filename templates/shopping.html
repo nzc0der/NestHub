@@ -91,11 +91,9 @@
         <div class="item-meta">Added by {{ item.author|capitalize }} • {{ item.created_at[:10] }}</div>
       </div>
       <div class="item-actions">
-        {% if session.role == 'admin' or session.shopping_permission == 'full' or session.user_id == item.added_by %}
         <form method="POST" action="{{ url_for('shopping_delete', item_id=item.id) }}">
           <button type="submit" title="Remove Item"><i class="fas fa-trash-can"></i></button>
         </form>
-        {% endif %}
       </div>
     </div>
     {% endfor %}
