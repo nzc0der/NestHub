@@ -1,14 +1,5 @@
 """
 settings.py - Central configuration and utility module.
-
-This module is a pure library. It does NOT start a server, run interactive
-prompts, or perform any I/O side-effects at import time. All functions are
-safe to call from any context.
-
-Responsibilities:
-  - Loading / saving / resetting config.json.
-  - SQLite user management (get, add, verify).
-  - System-level helpers (is_initialized, path resolution).
 """
 
 import json
@@ -20,30 +11,14 @@ from typing import Optional
 
 import bcrypt
 
-# ---------------------------------------------------------------------------
-# Logging
-# ---------------------------------------------------------------------------
-
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Path constants
-# ---------------------------------------------------------------------------
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(PROJECT_ROOT, "config.json")
 
-PROJECT_ROOT: str = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH: str = os.path.join(PROJECT_ROOT, "config.json")
-
-_DEFAULT_DB_PATH: str = os.path.join(PROJECT_ROOT, "data", "family.db")
-_DEFAULT_BACKUP_DIR: str = os.path.join(PROJECT_ROOT, "backups")
-_DEFAULT_PORT: int = 8000
-_DEFAULT_LATITUDE: float = -37.9034
-_DEFAULT_LONGITUDE: float = 145.0416
-_DEFAULT_CITY: str = "Ormond"
-
-# ---------------------------------------------------------------------------
-# Config helpers
-# ---------------------------------------------------------------------------
-
+_DEFAULT_DB_PATH = os.path.join(PROJECT_ROOT, "data", "family.db")
+_DEFAULT_BACKUP_DIR = os.path.join(PROJECT_ROOT, "backups")
+_DEFAULT_PORT = 8000
 
 def load_config() -> dict:
     if not os.path.isfile(CONFIG_PATH):
@@ -54,7 +29,6 @@ def load_config() -> dict:
     except json.JSONDecodeError as exc:
         raise ValueError(f"config.json is malformed: {exc}") from exc
 
-
 def save_config(data: dict) -> None:
     tmp_path = CONFIG_PATH + ".tmp"
     try:
@@ -63,19 +37,14 @@ def save_config(data: dict) -> None:
             fh.flush()
             os.fsync(fh.fileno())
         os.replace(tmp_path, CONFIG_PATH)
-        logger.debug("config.json saved successfully.")
-    except OSError as exc:
-        logger.error("Failed to save config.json: %s", exc)
+    except OSError:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
         raise
 
-
 def reset_config() -> None:
     if os.path.isfile(CONFIG_PATH):
         os.remove(CONFIG_PATH)
-        logger.warning("config.json removed. System will reinitialize on next start.")
-
 
 def is_initialized() -> bool:
     try:
@@ -84,35 +53,25 @@ def is_initialized() -> bool:
     except ValueError:
         return False
 
-
 def _db_path() -> str:
     cfg = load_config()
     return cfg.get("db_path", _DEFAULT_DB_PATH)
-
 
 def _backup_dir() -> str:
     cfg = load_config()
     return cfg.get("backup_dir", _DEFAULT_BACKUP_DIR)
 
-
 def get_server_port() -> int:
     cfg = load_config()
     return cfg.get("port", _DEFAULT_PORT)
 
-
 def get_weather_config() -> dict:
     cfg = load_config()
     return {
-        "lat": cfg.get("latitude", _DEFAULT_LATITUDE),
-        "lon": cfg.get("longitude", _DEFAULT_LONGITUDE),
-        "city": cfg.get("city", _DEFAULT_CITY)
+        "lat": cfg.get("latitude", -37.9034),
+        "lon": cfg.get("longitude", 145.0416),
+        "city": cfg.get("city", "Ormond")
     }
-
-
-# ---------------------------------------------------------------------------
-# Database
-# ---------------------------------------------------------------------------
-
 
 @contextmanager
 def _get_db():
@@ -130,7 +89,6 @@ def _get_db():
         raise
     finally:
         conn.close()
-
 
 def init_schema() -> None:
     with _get_db() as conn:
@@ -204,55 +162,34 @@ def init_schema() -> None:
             );
             """
         )
-        try:
-            conn.execute("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'Available';")
-        except sqlite3.OperationalError:
-            pass
-        try:
-            conn.execute("ALTER TABLE users ADD COLUMN shopping_permission TEXT DEFAULT 'full';")
-        except sqlite3.OperationalError:
-            pass
-        try:
-            conn.execute("ALTER TABLE events ADD COLUMN end_date DATETIME;")
-        except sqlite3.OperationalError:
-            pass
+        # Migrations
+        for cmd in [
+            "ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'Available'",
+            "ALTER TABLE users ADD COLUMN shopping_permission TEXT DEFAULT 'full'",
+            "ALTER TABLE events ADD COLUMN end_date DATETIME"
+        ]:
+            try:
+                conn.execute(cmd)
+            except sqlite3.OperationalError:
+                pass
     logger.info("Database schema verified / created.")
-
-
-# ---------------------------------------------------------------------------
-# User management
-# ---------------------------------------------------------------------------
-
 
 def get_users() -> list[dict]:
     with _get_db() as conn:
-        rows = conn.execute(
-            "SELECT id, username, password_hash, role, shopping_permission, status, created_at FROM users ORDER BY id"
-        ).fetchall()
+        rows = conn.execute("SELECT * FROM users ORDER BY id").fetchall()
     return [dict(row) for row in rows]
-
 
 def get_user_by_username(username: str) -> Optional[dict]:
     with _get_db() as conn:
-        row = conn.execute(
-            "SELECT id, username, password_hash, role, shopping_permission, status, created_at FROM users WHERE username = ?",
-            (username,),
-        ).fetchone()
+        row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
     return dict(row) if row else None
-
 
 def get_user_by_id(user_id: int) -> Optional[dict]:
     with _get_db() as conn:
-        row = conn.execute(
-            "SELECT id, username, password_hash, role, shopping_permission, status, created_at FROM users WHERE id = ?",
-            (user_id,),
-        ).fetchone()
+        row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
     return dict(row) if row else None
 
-
 def add_user(username: str, password: Optional[str], role: str = "user", shopping_permission: str = "full") -> int:
-    if get_user_by_username(username) is not None:
-        raise ValueError(f"Username '{username}' already exists.")
     password_hash = None
     if password is not None:
         password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
@@ -263,7 +200,6 @@ def add_user(username: str, password: Optional[str], role: str = "user", shoppin
         )
         return cursor.lastrowid
 
-
 def verify_user(username: str, password: str) -> Optional[dict]:
     user = get_user_by_username(username)
     if not user or not user["password_hash"]:
@@ -272,22 +208,18 @@ def verify_user(username: str, password: str) -> Optional[dict]:
         return user
     return None
 
-
 def change_password(user_id: int, new_password: str) -> None:
     password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
     with _get_db() as conn:
         conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, user_id))
 
-
 def update_user_status(user_id: int, status: str) -> None:
     with _get_db() as conn:
         conn.execute("UPDATE users SET status = ? WHERE id = ?", (status, user_id))
 
-
 def set_shopping_permission(user_id: int, permission: str) -> None:
     with _get_db() as conn:
         conn.execute("UPDATE users SET shopping_permission = ? WHERE id = ?", (permission, user_id))
-
 
 def delete_user(user_id: int) -> None:
     with _get_db() as conn:
@@ -298,17 +230,9 @@ def delete_user(user_id: int) -> None:
                 raise ValueError("Cannot delete the last admin account.")
         conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
 
-
-# ---------------------------------------------------------------------------
-# Feature helpers
-# ---------------------------------------------------------------------------
-
 def get_todos(user_id: int) -> list[dict]:
     with _get_db() as conn:
-        rows = conn.execute(
-            "SELECT * FROM todos WHERE user_id = ? ORDER BY done ASC, created_at DESC",
-            (user_id,),
-        ).fetchall()
+        rows = conn.execute("SELECT * FROM todos WHERE user_id = ? ORDER BY done ASC, created_at DESC", (user_id,)).fetchall()
     return [dict(r) for r in rows]
 
 def add_todo(user_id: int, content: str) -> int:
@@ -318,10 +242,7 @@ def add_todo(user_id: int, content: str) -> int:
 
 def toggle_todo(todo_id: int, user_id: int) -> None:
     with _get_db() as conn:
-        conn.execute(
-            "UPDATE todos SET done = CASE WHEN done = 0 THEN 1 ELSE 0 END, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
-            (todo_id, user_id)
-        )
+        conn.execute("UPDATE todos SET done = CASE WHEN done = 0 THEN 1 ELSE 0 END, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?", (todo_id, user_id))
 
 def delete_todo(todo_id: int, user_id: int) -> None:
     with _get_db() as conn:
@@ -329,9 +250,7 @@ def delete_todo(todo_id: int, user_id: int) -> None:
 
 def get_notes() -> list[dict]:
     with _get_db() as conn:
-        rows = conn.execute(
-            "SELECT n.*, u.username as author FROM notes n JOIN users u ON u.id = n.user_id ORDER BY n.updated_at DESC"
-        ).fetchall()
+        rows = conn.execute("SELECT n.*, u.username as author FROM notes n JOIN users u ON u.id = n.user_id ORDER BY n.updated_at DESC").fetchall()
     return [dict(r) for r in rows]
 
 def upsert_note(user_id: int, note_id: Optional[int], title: str, content: str, is_admin: bool = False) -> int:
@@ -355,9 +274,7 @@ def delete_note(note_id: int, user_id: int, is_admin: bool = False) -> None:
 
 def get_announcements() -> list[dict]:
     with _get_db() as conn:
-        rows = conn.execute(
-            "SELECT a.*, u.username as author FROM announcements a LEFT JOIN users u ON u.id = a.author_id ORDER BY a.pinned DESC, a.created_at DESC"
-        ).fetchall()
+        rows = conn.execute("SELECT a.*, u.username as author FROM announcements a LEFT JOIN users u ON u.id = a.author_id ORDER BY a.pinned DESC, a.created_at DESC").fetchall()
     return [dict(r) for r in rows]
 
 def add_announcement(author_id: int, title: str, body: str, pinned: bool = False) -> int:
@@ -378,9 +295,9 @@ def get_bookmarks() -> list[dict]:
         rows = conn.execute("SELECT * FROM bookmarks ORDER BY created_at DESC").fetchall()
     return [dict(r) for r in rows]
 
-def add_bookmark(title: str, url: str, icon: str = "🌐") -> int:
+def add_bookmark(title: str, url: str, icon: str = '🌐') -> int:
     with _get_db() as conn:
-        cur = conn.execute("INSERT INTO bookmarks (title, url, icon) VALUES (?, ?, ?)", (title.strip(), url.strip(), icon.strip() or "🌐"))
+        cur = conn.execute("INSERT INTO bookmarks (title, url, icon) VALUES (?, ?, ?)", (title.strip(), url.strip(), icon.strip() or '🌐'))
         return cur.lastrowid
 
 def delete_bookmark(bm_id: int) -> None:

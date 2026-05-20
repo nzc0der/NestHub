@@ -51,7 +51,7 @@
           {% endif %}
           <div style="height: 1px; background: var(--border-color); margin: 0.5rem;"></div>
           <a href="{{ url_for('set_ui_mode', mode='pc' if session.ui_mode == 'mobile' else 'mobile') }}" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-main); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-desktop" style="margin-right: 8px; width: 16px;"></i> Switch to {{ 'PC' if session.ui_mode == 'mobile' else 'Mobile' }} UI</a>
-          <a href="{{ url_for('logout') }}" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--danger); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-sign-out-alt" style="margin-right: 8px; width: 16px;"></i> Log out</a>
+          <a href="#" onclick="UI.showModal('status-modal')" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-main); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-circle-user" style="margin-right: 8px; width: 16px;"></i> Status</a><a href="{{ url_for('logout') }}" style="display: block; padding: 0.75rem 1rem; border-radius: 8px; color: var(--danger); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-sign-out-alt" style="margin-right: 8px; width: 16px;"></i> Log out</a>
         </div>
       </div>
 
@@ -138,5 +138,14 @@
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block extra_scripts %}{% endblock %}
+
+  <div id="status-modal" class="base-modal-overlay hidden">
+    <div class="glass-panel" style="width: 90%; max-width: 400px; padding: 2.5rem;">
+      <form method="POST" action="{{ url_for('update_status') }}">
+        <select name="status" required><option value="Available">Available</option><option value="Busy">Busy</option></select>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Status</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

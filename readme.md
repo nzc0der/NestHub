@@ -8,7 +8,7 @@
 [![HTML5](https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://python.org)
 
-A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organize your family life with task management, shopping lists, shared calendars, and shared notes—all in one private, secure interface.
+A premium, self-hosted family dashboard designed to run on a Raspberry Pi. Organize your family life with task management, shopping lists, shared calendars, and more—all in one beautiful, private interface.
 
 ---
 

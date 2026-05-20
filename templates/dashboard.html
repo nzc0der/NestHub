@@ -22,14 +22,13 @@
   .bento-announcements { grid-column: span 4; grid-row: span 2; }
   .bento-meal { grid-column: span 4; grid-row: span 2; }
   .bento-status { grid-column: span 8; grid-row: span 1; }
-  .bento-links { grid-column: span 12; grid-row: span 1; display: flex; align-items: center; gap: 1.5rem; }
+  .bento-links { grid-column: span 8; grid-row: span 1; display: flex; align-items: center; gap: 1.5rem; }
 
   @media (max-width: 1024px) {
     .bento-weather { grid-column: span 12; }
     .bento-tasks { grid-column: span 6; grid-row: span 2; }
     .bento-calendar { grid-column: span 6; grid-row: span 2; }
     .bento-announcements, .bento-meal { grid-column: span 12; }
-    .bento-status { grid-column: span 12; }
     .bento-links { grid-column: span 12; }
   }
 
@@ -160,12 +159,7 @@
 
   <!-- Active Tasks -->
   <div class="bento-item glass-panel bento-tasks">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <span class="section-label" style="margin-bottom: 0;"><i class="fas fa-list-check"></i> Active Tasks</span>
-      <form method="POST" action="{{ url_for('todo_clear_completed') }}">
-        <button type="submit" class="btn btn-ghost" style="padding: 0.4rem; font-size: 0.7rem;" title="Clear Completed"><i class="fas fa-broom"></i></button>
-      </form>
-    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;"><span class="section-label" style="margin-bottom: 0;"><i class="fas fa-list-check"></i> Tasks</span><form method="POST" action="{{ url_for('todo_clear_completed') }}"><button type="submit" class="btn btn-ghost" title="Clear Completed"><i class="fas fa-broom"></i></button></form></div>
     <div class="list-stack">
       {% for todo in todos[:5] %}
       <div class="task-item" onclick="document.getElementById('toggle-todo-{{ todo.id }}').submit();">
@@ -214,7 +208,6 @@
       <div style="padding: 1rem; border-left: 3px solid var(--accent); background: hsla(0,0%,100%,0.02); border-radius: 0 12px 12px 0; margin-bottom: 0.5rem;">
         <div style="font-weight: 800; font-size: 1rem; margin-bottom: 0.2rem;">{{ ann.title }}</div>
         <div style="font-size: 0.75rem; color: var(--text-muted);">{{ ann.author }}</div>
-        <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ ann.body|markdown|striptags }}</div>
       </div>
       {% endfor %}
       {% if not announcements %}
@@ -227,20 +220,12 @@
   <div class="bento-item glass-panel bento-status">
     <span class="section-label"><i class="fas fa-users-viewfinder"></i> Family Status</span>
     <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; height: 100%;">
-      {% for u in all_users %}
-      {% if u.username != 'guest' %}
+      {% for u in all_users %}{% if u.username != 'guest' %}
       <div style="display: flex; align-items: center; gap: 0.75rem; background: hsla(0,0%,100%,0.03); padding: 0.75rem 1.25rem; border-radius: 16px; border: 1px solid var(--border-color);">
         <div class="avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">{{ u.username[0]|upper }}</div>
-        <div>
-          <div style="font-weight: 800; font-size: 0.9rem;">{{ u.username|capitalize }}</div>
-          <div style="font-size: 0.7rem; display: flex; align-items: center; gap: 0.4rem;">
-            <div style="width: 6px; height: 6px; border-radius: 50%; background: {% if u.status == 'Available' %}var(--success){% elif u.status == 'Busy' %}var(--danger){% else %}var(--warning){% endif %};"></div>
-            <span style="color: var(--text-dim);">{{ u.status }}</span>
-          </div>
-        </div>
+        <div><div style="font-weight: 800; font-size: 0.9rem;">{{ u.username|capitalize }}</div><div style="font-size: 0.7rem; display: flex; align-items: center; gap: 0.4rem;"><div style="width: 6px; height: 6px; border-radius: 50%; background: {% if u.status == 'Available' %}var(--success){% elif u.status == 'Busy' %}var(--danger){% else %}var(--warning){% endif %};"></div><span style="color: var(--text-dim);">{{ u.status }}</span></div></div>
       </div>
-      {% endif %}
-      {% endfor %}
+      {% endif %}{% endfor %}
     </div>
   </div>
 
