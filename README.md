@@ -1,10 +1,10 @@
-# NestBoard | Premium Family Dashboard
+# NestHub | Premium Family Dashboard
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/flask-3.1-green.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**NestBoard** is a sophisticated, self-hosted family management ecosystem. Built with a robust Python/Flask backend and a stunning, mobile-first glassmorphic Single Page Application (SPA) frontend, it provides a unified interface for organizing your family's daily life.
+**NestHub** is a sophisticated, self-hosted family management ecosystem. Built with a robust Python/Flask backend and a stunning, mobile-first glassmorphic Single Page Application (SPA) frontend, it provides a unified interface for organizing your family's daily life.
 
 ---
 
@@ -50,8 +50,8 @@
 
 1. **Clone & Enter**:
    ```bash
-   git clone https://github.com/nzc0der/FamilySystem.git
-   cd FamilySystem
+   git clone https://github.com/nzc0der/NestHub.git
+   cd NestHub
    ```
 
 2. **Environment Setup**:
@@ -71,7 +71,7 @@
 
 ## Remote Access with Tailscale
 
-To access NestBoard securely from anywhere in the world without complex port forwarding:
+To access NestHub securely from anywhere in the world without complex port forwarding:
 
 1. **Install Tailscale**: Download and install [Tailscale](https://tailscale.com/download) on your host machine (e.g., Raspberry Pi) and your mobile devices.
 2. **Authenticate**: Log in on all devices.
@@ -104,5 +104,5 @@ python3 backend/tests.py
 ---
 
 ## License
-NestBoard is distributed under the **MIT License**. See `LICENSE` for details.
+NestHub is distributed under the **MIT License**. See `LICENSE` for details.
 
