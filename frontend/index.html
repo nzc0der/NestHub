@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NestBoard | Premium Family Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="loading">
+    <div id="app">
+        <!-- Sidebar / Navigation -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-home-alt"></i></div>
+                    <span class="logo-text">NestBoard</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-grid-2"></i> <span>Dashboard</span>
+                </a>
+                <a href="/calendar" class="nav-item" data-view="calendar">
+                    <i class="fas fa-calendar-day"></i> <span>Calendar</span>
+                </a>
+                <a href="/chores" class="nav-item" data-view="chores">
+                    <i class="fas fa-list-check"></i> <span>Chores</span>
+                </a>
+                <a href="/grocery" class="nav-item" data-view="grocery">
+                    <i class="fas fa-shopping-basket"></i> <span>Grocery</span>
+                </a>
+                <a href="/meals" class="nav-item" data-view="meals">
+                    <i class="fas fa-utensils"></i> <span>Meals</span>
+                </a>
+                <a href="/messages" class="nav-item" data-view="messages">
+                    <i class="fas fa-comment-dots"></i> <span>Messages</span>
+                </a>
+                <a href="/extras" class="nav-item" data-view="extras">
+                    <i class="fas fa-sparkles"></i> <span>Extras</span>
+                </a>
+                <a href="/admin" class="nav-item admin-only hidden" data-view="admin">
+                    <i class="fas fa-user-shield"></i> <span>Admin</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile" id="user-profile-trigger">
+                    <div class="user-avatar" id="current-user-avatar">?</div>
+                    <div class="user-info">
+                        <div class="user-name" id="current-user-name">Guest</div>
+                        <div class="user-role" id="current-user-role">Visitor</div>
+                    </div>
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search family items...">
+                </div>
+                <div class="top-actions">
+                    <button class="icon-btn"><i class="fas fa-bell"></i><span class="badge"></span></button>
+                    <button class="icon-btn theme-toggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+
+            <div id="view-container" class="view-container">
+                <!-- Views will be injected here -->
+                <div class="loader"></div>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Tab Bar -->
+        <nav class="mobile-nav">
+            <a href="/" class="mobile-nav-item active" data-view="dashboard"><i class="fas fa-grid-2"></i></a>
+            <a href="/calendar" class="mobile-nav-item" data-view="calendar"><i class="fas fa-calendar-day"></i></a>
+            <a href="/chores" class="mobile-nav-item" data-view="chores"><i class="fas fa-list-check"></i></a>
+            <a href="/grocery" class="mobile-nav-item" data-view="grocery"><i class="fas fa-shopping-basket"></i></a>
+            <a href="/messages" class="mobile-nav-item" data-view="messages"><i class="fas fa-comment-dots"></i></a>
+        </nav>
+    </div>
+
+    <!-- Auth Overlays -->
+    <div id="auth-overlay" class="modal-overlay hidden">
+        <div class="auth-card glass">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="signup">New Family</button>
+                <button class="auth-tab" data-tab="join">Join Family</button>
+            </div>
+            <div class="auth-form-container">
+                <form id="login-form" class="auth-form">
+                    <h2>Welcome Back</h2>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" name="username" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Login</button>
+                </form>
+                <!-- Other forms will be toggled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>
