@@ -1,4 +1,4 @@
-# 🏠 NestBoard | Premium Family Dashboard
+# NestBoard | Premium Family Dashboard
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/flask-3.1-green.svg)](https://flask.palletsprojects.com/)
@@ -8,27 +8,27 @@
 
 ---
 
-## 🌟 Core Features
+## Core Features
 
-### 📅 Family Organization
+### Family Organization
 - **Unified Calendar**: Shared event tracking with a responsive grid view.
 - **Smart Chores**: Points-based task management system with Parent/Admin approval workflow.
 - **Dynamic Grocery List**: Real-time collaborative shopping list with role-based restrictions (children can collect, but only parents/admins can finalize purchases).
 - **Meal Planner**: Weekly menu organization with automated categorization.
 
-### 💬 Communication & Media
+### Communication & Media
 - **Family Chat**: Real-time messaging for family updates and coordinate.
 - **Photo Gallery**: Share family memories with a moderated approval system for younger members.
 - **Sticky Notes**: Digital board for quick reminders and shared notes.
 
-### 🛠️ Advanced Tools
+### Advanced Tools
 - **Pet Care Log**: Track feedings, walks, and health updates for family pets.
 - **Emergency Hub**: Centralized access to critical contacts and information.
 - **Admin Dashboard**: Comprehensive system statistics, activity logs, and real-time system health diagnostics.
 
 ---
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 ### Backend (Python/Flask)
 - **Modular Design**: Blueprint-based routing for clean separation of concerns.
@@ -44,14 +44,14 @@
 
 ---
 
-## 🚀 Installation & Deployment
+## Installation & Deployment
 
 ### Local Development Setup
 
 1. **Clone & Enter**:
    ```bash
-   git clone https://github.com/your-username/nestboard.git
-   cd nestboard
+   git clone https://github.com/nzc0der/FamilySystem.git
+   cd FamilySystem
    ```
 
 2. **Environment Setup**:
@@ -69,7 +69,7 @@
 
 ---
 
-## 🌐 Remote Access with Tailscale
+## Remote Access with Tailscale
 
 To access NestBoard securely from anywhere in the world without complex port forwarding:
 
@@ -81,7 +81,7 @@ To access NestBoard securely from anywhere in the world without complex port for
 
 ---
 
-## 🩺 Diagnostics & Troubleshooting
+## Diagnostics & Troubleshooting
 
 ### Built-in Diagnostics
 Admins can access the **Admin Panel** to view real-time metrics:
@@ -103,8 +103,6 @@ python3 backend/tests.py
 
 ---
 
-## 📄 License
+## License
 NestBoard is distributed under the **MIT License**. See `LICENSE` for details.
 
----
-*Created with ❤️ for families everywhere.*
