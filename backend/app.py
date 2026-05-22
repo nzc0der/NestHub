@@ -1,5 +1,9 @@
 import os
+import sys
 from flask import Flask, send_from_directory, g, session
+
+# Add project root to sys.path to allow running this script directly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask_cors import CORS
 from backend.database.db import init_db, query_db
 from backend.routes.auth import auth_bp
