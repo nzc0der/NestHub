@@ -77,6 +77,7 @@ window.addEventListener('popstate', router);
 
 document.addEventListener('DOMContentLoaded', () => {
     initAuth().then(user => {
+        document.body.classList.remove('loading');
         if (user) router();
     });
 });

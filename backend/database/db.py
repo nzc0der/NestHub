@@ -19,6 +19,15 @@ def init_db(app):
         db = get_db()
         with app.open_resource('database/schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
+
+        # Ensure a default family exists for self-hosted single-family use
+        existing_family = db.execute("SELECT id FROM families LIMIT 1").fetchone()
+        if not existing_family:
+            db.execute("INSERT INTO families (name, invite_code) VALUES (?, ?)", ('Our Home', 'SELF_HOSTED'))
+
+        # Ensure 'purchased' is not used anymore, instead use 'archived' if we want to hide it
+        # Or just keep it as is.
+
         db.commit()
 
 def query_db(query, args=(), one=False):
