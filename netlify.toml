@@ -1,4 +1,5 @@
 [build]
+  command = "python3 auto_setup.py"
   publish = "frontend"
 
 [[redirects]]
