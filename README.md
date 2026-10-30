@@ -1,8 +1,3 @@
-<!-- GitAds-Verify: FY2QOC8KNWLR3LH86CR1WWPFMIGS77B4 -->
-## GitAds Sponsored
-[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=nzc0der/nesthub@github)](https://gitads.dev/v1/ad-track?source=nzc0der/nesthub@github)
-[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=nzc0der/nesthub@github)](https://gitads.dev/v1/ad-track?source=nzc0der/nesthub@github)
-
 # NestHub | Premium Family Dashboard
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
