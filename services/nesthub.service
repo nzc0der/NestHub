@@ -1,0 +1,34 @@
+[Unit]
+Description=NestHub Backend Server
+Documentation=https://github.com/nzc0der/NestHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/NestHub
+ExecStart=/home/pi/NestHub/venv/bin/python /home/pi/NestHub/backend/app.py
+Restart=always
+RestartSec=3
+StartLimitInterval=120
+StartLimitBurst=5
+
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PORT=8000
+Environment=WEATHER_LAT=-37.9044
+Environment=WEATHER_LON=145.0396
+Environment=WEATHER_TIMEZONE=Australia/Melbourne
+Environment=WEATHER_LOCATION_NAME="Ormond, Melbourne"
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nesthub-server
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

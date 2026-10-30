@@ -1,0 +1,25 @@
+[Unit]
+Description=NestHub Chromium Kiosk Display for Panasonic TV
+Documentation=https://github.com/nzc0der/NestHub
+After=graphical.target nesthub.service
+Wants=nesthub.service
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Environment=NESHUB_DASHBOARD_URL=http://localhost:8000/dashboard
+Environment=NESHUB_HEALTH_URL=http://localhost:8000/api/tv/summary
+WorkingDirectory=/home/pi/NestHub
+ExecStart=/bin/bash /home/pi/NestHub/scripts/start_kiosk.sh
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nesthub-kiosk
+
+[Install]
+WantedBy=graphical.target

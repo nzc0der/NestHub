@@ -74,5 +74,68 @@ class NestBoardTestCase(unittest.TestCase):
         res = self.client.post('/api/extra/photos', json={'image_url': 'http://test.com/2.jpg'})
         self.assertEqual(res.get_json()['status'], 'approved')
 
+    def test_tv_summary_endpoint(self):
+        """Test the TV companion summary endpoint returns aggregate family data."""
+        # Insert sample events and chores for family 1
+        db_module.execute_db(
+            "INSERT INTO events (family_id, title, start_time, location) VALUES (?, ?, ?, ?)",
+            (1, "Family Dinner", "2025-12-01 19:00", "Dining Room")
+        )
+        db_module.execute_db(
+            "INSERT INTO chores (family_id, title, priority, status) VALUES (?, ?, ?, ?)",
+            (1, "Feed the dog", "high", "pending")
+        )
+        db_module.execute_db(
+            "INSERT INTO meals (family_id, day_of_week, meal_type, description) VALUES (?, ?, ?, ?)",
+            (1, "Monday", "Dinner", "Spaghetti Bolognese")
+        )
+        db_module.execute_db(
+            "INSERT INTO grocery_items (family_id, name, status) VALUES (?, ?, ?)",
+            (1, "Milk", "active")
+        )
+
+        res = self.client.get('/api/tv/summary')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data['configured'])
+        self.assertEqual(data['family']['name'], 'Test Family')
+        self.assertGreaterEqual(len(data['calendar']), 1)
+        self.assertEqual(data['calendar'][0]['title'], 'Family Dinner')
+        self.assertGreaterEqual(len(data['chores']), 1)
+        self.assertEqual(data['chores'][0]['title'], 'Feed the dog')
+        self.assertGreaterEqual(len(data['meals']), 1)
+        self.assertGreaterEqual(len(data['grocery']), 1)
+
+    def test_tv_weather_endpoint(self):
+        """Test the weather proxy and fallback/cache logic."""
+        res = self.client.get('/api/tv/weather')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertIn('current', data)
+        self.assertIn('temperature', data['current'])
+        self.assertIn('forecast', data)
+        self.assertEqual(data['location'], 'Ormond, Melbourne')
+
+    def test_tv_dashboard_routes(self):
+        """Test that /dashboard and /tv static files are served properly."""
+        res = self.client.get('/dashboard')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'NestHub | TV Companion Dashboard', res.data)
+
+        res_slash = self.client.get('/dashboard/')
+        self.assertEqual(res_slash.status_code, 200)
+
+        res_css = self.client.get('/tv/dashboard.css')
+        self.assertEqual(res_css.status_code, 200)
+
+        res_js = self.client.get('/tv/dashboard.js')
+        self.assertEqual(res_js.status_code, 200)
+
+    def test_phone_interface_intact(self):
+        """Test that existing index.html and phone routes remain intact."""
+        res = self.client.get('/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'NestBoard | Premium Family Dashboard', res.data)
+
 if __name__ == '__main__':
     unittest.main()
