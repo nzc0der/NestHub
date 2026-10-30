@@ -14,6 +14,7 @@ from backend.routes.grocery import grocery_bp
 from backend.routes.meals import meals_bp
 from backend.routes.messages import messages_bp
 from backend.routes.extra import extra_bp
+from backend.routes.tv import tv_bp
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app, supports_credentials=True)
@@ -28,6 +29,7 @@ app.register_blueprint(grocery_bp, url_prefix='/api/grocery')
 app.register_blueprint(meals_bp, url_prefix='/api/meals')
 app.register_blueprint(messages_bp, url_prefix='/api/messages')
 app.register_blueprint(extra_bp, url_prefix='/api/extra')
+app.register_blueprint(tv_bp, url_prefix='/api/tv')
 
 @app.before_request
 def load_user():
@@ -40,6 +42,18 @@ def load_user():
 @app.route('/')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
+
+# Dedicated TV Companion Dashboard entry points
+@app.route('/dashboard')
+@app.route('/dashboard/')
+def tv_dashboard():
+    tv_folder = os.path.join(app.static_folder, 'tv')
+    return send_from_directory(tv_folder, 'index.html')
+
+@app.route('/tv/<path:path>')
+def tv_static(path):
+    tv_folder = os.path.join(app.static_folder, 'tv')
+    return send_from_directory(tv_folder, path)
 
 # Catch-all for SPA routing
 @app.route('/<path:path>')

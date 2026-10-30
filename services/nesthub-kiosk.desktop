@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=NestHub TV Kiosk
+Comment=Autostart Chromium TV Kiosk Dashboard
+Exec=/bin/bash /home/pi/NestHub/scripts/start_kiosk.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true

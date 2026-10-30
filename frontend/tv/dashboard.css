@@ -1,0 +1,903 @@
+/* ==========================================================================
+   NestHub TV Companion Dashboard - 16:9 Living Room Display Stylesheet
+   Tailored for Raspberry Pi 400 & Panasonic TV
+   ========================================================================== */
+
+:root {
+    /* Color Palette */
+    --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Base Dimensions for 10-foot 1080p Experience */
+    --tv-pad: 24px;
+    --card-radius: 20px;
+    --card-pad: 20px;
+    --border-glass: rgba(255, 255, 255, 0.12);
+    --border-glass-hover: rgba(255, 255, 255, 0.22);
+
+    /* Text Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Accent Accents */
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-glow: rgba(99, 102, 241, 0.35);
+
+    --color-blue: #38bdf8;
+    --color-cyan: #22d3ee;
+    --color-green: #34d399;
+    --color-amber: #fbbf24;
+    --color-orange: #fb923c;
+    --color-pink: #f472b6;
+    --color-yellow: #facc15;
+    --color-red: #f87171;
+
+    /* Dynamic Day/Night Theme Background Variables */
+    --bg-base: #0b0f19;
+    --bg-card: rgba(26, 33, 56, 0.55);
+    --ambient-glow-1: rgba(99, 102, 241, 0.18);
+    --ambient-glow-2: rgba(56, 189, 248, 0.15);
+    --ambient-glow-3: rgba(168, 85, 247, 0.12);
+    --card-blur: blur(28px);
+
+    /* Night Screen Protection Dim Factor (1 = normal, 0.7 = night dimmed) */
+    --tv-dim-brightness: 1;
+}
+
+/* Day Themes */
+body.theme-morning {
+    --bg-base: #0f172a;
+    --bg-card: rgba(30, 41, 59, 0.6);
+    --ambient-glow-1: rgba(251, 146, 60, 0.22);  /* Warm sunrise orange */
+    --ambient-glow-2: rgba(253, 186, 116, 0.18); /* Soft amber */
+    --ambient-glow-3: rgba(129, 140, 248, 0.15); /* Soft morning indigo */
+}
+
+body.theme-day {
+    --bg-base: #0c1322;
+    --bg-card: rgba(23, 37, 65, 0.55);
+    --ambient-glow-1: rgba(14, 165, 233, 0.2);  /* Daylight sky blue */
+    --ambient-glow-2: rgba(59, 130, 246, 0.16); /* Rich blue */
+    --ambient-glow-3: rgba(99, 102, 241, 0.14); /* Soft indigo */
+}
+
+body.theme-evening {
+    --bg-base: #110e1b;
+    --bg-card: rgba(36, 27, 56, 0.6);
+    --ambient-glow-1: rgba(244, 63, 94, 0.2);   /* Sunset rose */
+    --ambient-glow-2: rgba(217, 70, 239, 0.18); /* Sunset magenta */
+    --ambient-glow-3: rgba(245, 158, 11, 0.15); /* Golden hour */
+}
+
+body.theme-night {
+    --bg-base: #05070d;
+    --bg-card: rgba(15, 23, 42, 0.7);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --ambient-glow-1: rgba(67, 56, 202, 0.12);  /* Deep atmospheric navy */
+    --ambient-glow-2: rgba(30, 58, 138, 0.10);
+    --ambient-glow-3: rgba(88, 28, 135, 0.08);
+    --tv-dim-brightness: 0.85; /* Auto-dim for night room viewing and OLED/plasma protection */
+}
+
+/* Reset and Global Setup */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    user-select: none;
+    cursor: default;
+    transition: background-color 1.5s ease;
+}
+
+body {
+    filter: brightness(var(--tv-dim-brightness));
+    transition: filter 2s ease, background-color 2s ease;
+}
+
+/* Ambient Backlight Diffusion */
+.ambient-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    pointer-events: none;
+    transition: background 3s ease;
+}
+
+.glow-1 {
+    width: 65vw;
+    height: 65vw;
+    top: -20vw;
+    left: -10vw;
+    background: var(--ambient-glow-1);
+}
+
+.glow-2 {
+    width: 60vw;
+    height: 60vw;
+    bottom: -15vw;
+    right: -10vw;
+    background: var(--ambient-glow-2);
+}
+
+.glow-3 {
+    width: 50vw;
+    height: 50vw;
+    top: 30%;
+    left: 35%;
+    background: var(--ambient-glow-3);
+}
+
+/* TV Screen Container (16:9 ratio fixed presentation with subtle pixel shift) */
+.tv-screen-container {
+    position: relative;
+    z-index: 1;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: var(--tv-pad);
+    gap: 18px;
+    box-sizing: border-box;
+    animation: tv-pixel-shift 60s infinite ease-in-out;
+}
+
+/* Screen Protection: Pixel-Shift Animation to prevent image retention / burn-in */
+@keyframes tv-pixel-shift {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(3px, 2px); }
+    50% { transform: translate(-2px, 3px); }
+    75% { transform: translate(-3px, -2px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* ==========================================================================
+   Header Bar
+   ========================================================================== */
+.tv-header {
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    backdrop-filter: var(--card-blur);
+    -webkit-backdrop-filter: var(--card-blur);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--card-radius);
+    padding: 0 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+}
+
+/* Brand */
+.brand-badge {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), #a855f7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.family-badge {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-light);
+    letter-spacing: 0.2px;
+}
+
+/* Central Melbourne Clock */
+.hero-clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.clock-time {
+    font-family: var(--font-mono);
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+}
+
+.clock-date-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.clock-day {
+    color: var(--text-primary);
+}
+
+.clock-separator {
+    color: var(--text-muted);
+}
+
+.clock-timezone-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: var(--color-blue);
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+/* Weather Header */
+.header-weather {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.weather-main-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.weather-icon-wrap {
+    font-size: 34px;
+    color: var(--color-amber);
+    filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.4));
+}
+
+.weather-temp-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-temp {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.weather-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.weather-metrics {
+    display: flex;
+    gap: 14px;
+    padding-left: 18px;
+    border-left: 1px solid var(--border-glass);
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Helper color classes */
+.text-accent { color: var(--accent-light); }
+.text-blue { color: var(--color-blue); }
+.text-cyan { color: var(--color-cyan); }
+.text-green { color: var(--color-green); }
+.text-amber { color: var(--color-amber); }
+.text-orange { color: var(--color-orange); }
+.text-pink { color: var(--color-pink); }
+.text-yellow { color: var(--color-yellow); }
+.text-red { color: var(--color-red); }
+
+/* ==========================================================================
+   Main Bento Grid (3 Column 16:9 Architecture)
+   ========================================================================== */
+.tv-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    min-height: 0; /* Important for flex child scroll containers */
+}
+
+.tv-col {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+}
+
+/* Glass Panels */
+.tv-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--card-blur);
+    -webkit-backdrop-filter: var(--card-blur);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.flex-grow-1 { flex: 1; }
+.flex-grow-2 { flex: 1.8; }
+.flex-compact { flex: 0.8; }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-title i {
+    font-size: 18px;
+}
+
+.card-title h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-outline {
+    border: 1px solid var(--border-glass);
+    color: var(--color-amber);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.location-tag {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.card-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.card-content.scrollable {
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Custom Lean Scrollbars */
+.card-content.scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+.card-content.scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+.card-content.scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+/* Event Items */
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.event-time-badge {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: var(--accent-light);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    min-width: 65px;
+    line-height: 1.2;
+}
+
+.event-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 2px;
+}
+
+/* Chores Items */
+.chore-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chore-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.chore-priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.p-high { background-color: var(--color-red); box-shadow: 0 0 6px var(--color-red); }
+.p-medium { background-color: var(--color-amber); }
+.p-low { background-color: var(--color-blue); }
+
+.chore-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chore-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chore-assigned {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.chore-points {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-amber);
+    background: rgba(251, 191, 36, 0.12);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+/* Meals */
+.meals-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    height: 100%;
+}
+
+.meal-block {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.meal-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-orange);
+    margin-bottom: 4px;
+}
+
+.meal-desc {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    flex: 1;
+}
+
+/* Grocery Chips */
+.grocery-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
+}
+
+.grocery-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.grocery-chip.collected {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+/* 5-Day Forecast Grid */
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    height: 100%;
+    align-items: center;
+}
+
+.forecast-day-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.forecast-date {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.forecast-icon {
+    font-size: 20px;
+    color: var(--color-cyan);
+    margin: 2px 0;
+}
+
+.forecast-temps {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.forecast-temp-min {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.forecast-rain {
+    font-size: 10px;
+    color: var(--color-blue);
+    font-weight: 600;
+}
+
+/* Sticky Notes */
+.notes-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: 100%;
+}
+
+.tv-note {
+    background: rgba(250, 204, 21, 0.08);
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tv-note-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-yellow);
+    margin-bottom: 4px;
+}
+
+.tv-note-body {
+    font-size: 12px;
+    color: var(--text-primary);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Pet Care Compact */
+.petcare-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 12px;
+}
+
+.petcare-meta {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* Status Indicator */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-green);
+    letter-spacing: 0.5px;
+}
+
+.status-indicator .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-green);
+    box-shadow: 0 0 8px var(--color-green);
+    animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Loading Skeletons */
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.skeleton-line {
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Footer Bar
+   ========================================================================== */
+.tv-footer {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-divider {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.conn-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+.conn-badge.online { color: var(--color-green); }
+.conn-badge.offline { color: var(--color-red); }
+
+/* ==========================================================================
+   Screen Saver & Inactivity Ambient Display
+   ========================================================================== */
+.screensaver-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #020307;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 1.5s ease;
+}
+
+.screensaver-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.screensaver-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: screensaver-drift 120s infinite alternate ease-in-out;
+}
+
+@keyframes screensaver-drift {
+    0% { transform: translate(-30px, -20px); }
+    50% { transform: translate(30px, 20px); }
+    100% { transform: translate(-20px, 30px); }
+}
+
+.screensaver-clock {
+    font-family: var(--font-mono);
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+}
+
+.screensaver-date {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 10px;
+}
+
+.screensaver-weather {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.screensaver-tip {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.2);
+    margin-top: 40px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Offline Toast */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.hidden {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+    pointer-events: none;
+}
